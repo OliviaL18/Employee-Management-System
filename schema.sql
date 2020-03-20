@@ -21,8 +21,8 @@ CREATE TABLE departments (
 
 CREATE TABLE roles (
     id int NOT NULL AUTO_INCREMENT,
-    title varchar(30) NOT NULL,
-    salary int NOT NULL,
+    title varchar(30),
+    salary decimal(7,2) NOT NULL,
     department_id int NOT NULL,
     PRIMARY KEY (id)
 );
