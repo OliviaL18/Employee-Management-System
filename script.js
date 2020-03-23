@@ -41,7 +41,7 @@ function startApp() {
                 console.log(`Select Action: ${mainAction}`);
             function readEmployees() {
                 connection.query(
-                    'SELECT e.employee_name, r.title FROM employees e LEFT JOIN roles r ON r.id = e.role_id', 
+                    'SELECT e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
                     function(err, res) {
                     if (err) throw err;
                     console.log("------------ EMPLOYEES ------------");
