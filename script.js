@@ -43,13 +43,38 @@ function startApp() {
                 connection.query(
                     'SELECT e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
                     function(err, res) {
-                    if (err) throw err;
-                    console.log("------------ EMPLOYEES ------------");
-                    console.table(res);
-                });
+                        if (err) throw err;
+                        console.log("------------ EMPLOYEES ------------");
+                        console.table(res);
+                    }
+                );
+            }
+            function readDepts() {
+                connection.query(
+                    'SELECT d.deptName FROM departments d', 
+                    function(err, res) {
+                        if (err) throw err;
+                        console.log("------------ Departments ------------");
+                        console.table(res);
+                    }
+                );
+            }
+            function readRoles() {
+                connection.query(
+                    'SELECT r.title, r.salary, d.deptName FROM roles r LEFT JOIN departments d ON d.id = r.department_id', 
+                    function(err, res) {
+                        if (err) throw err;
+                        console.log("------------ Roles ------------");
+                        console.table(res);
+                    }
+                );
             }
             if (mainAction == "View All Employees") {
                 readEmployees();
+            } else if (mainAction === "View All Departments") {
+                readDepts();
+            } else if (mainAction === "View All Roles") {
+                readRoles();
             }
         });
 }
