@@ -6,10 +6,9 @@ USE employeeDB;
 
 CREATE TABLE employees (
     id int NOT NULL AUTO_INCREMENT,
-    first_name varchar(30) NOT NULL,
-    last_name varchar(30) NOT NULL,
-    role_id int NOT NULL,
-    manager_id int NOT NULL,
+    employee_name varchar(30) NOT NULL,
+    role_id int,
+    manager_id int,
     PRIMARY KEY (id)
 );
 
