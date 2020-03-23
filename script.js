@@ -40,7 +40,9 @@ function startApp() {
             mainAction = answers.mainAction;
                 console.log(`Select Action: ${mainAction}`);
             function readEmployees() {
-                connection.query('SELECT * FROM employees', function(err, res) {
+                connection.query(
+                    'SELECT e.employee_name, r.title FROM employees e LEFT JOIN roles r ON r.id = e.role_id', 
+                    function(err, res) {
                     if (err) throw err;
                     console.log("------------ EMPLOYEES ------------");
                     console.table(res);
