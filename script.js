@@ -35,38 +35,55 @@ function startApp() {
     inquirer.prompt(menuPrompt).then(answers => {
         switch (answers.mainAction){
             case "View All Employees":
-                console.log(`Select Action
-                : ${answers.mainAction}`);
-                connection.query(
-                    'SELECT e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
-                    function(err, res) { 
-                        if (err) throw err;
-                        console.log("------------ EMPLOYEES ------------");
-                        console.table(res);
-                    }
-                );
+                console.log(`Select Action: ${answers.mainAction}`);
+                function readEmployees(callback) {
+                    connection.query(
+                        'SELECT e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
+                        function(err, res) { 
+                            if (err) throw err;
+                            console.log("------------ EMPLOYEES ------------");
+                            console.table(res);
+                        }
+                    );
+                    callback();
+                }
+                readEmployees(function(){
+                    startApp();
+                });
                 break;
             case "View All Departments":
                 console.log(`Select Action: ${answers.mainAction}`);
-                connection.query(
-                    'SELECT d.deptName FROM departments d', 
-                    function(err, res) {
-                        if (err) throw err;
-                        console.log("------------ Departments ------------");
-                        console.table(res);
-                    }
-                );
+                function readDepts(callback) {
+                    connection.query(
+                        'SELECT d.deptName FROM departments d', 
+                        function(err, res) {
+                            if (err) throw err;
+                            console.log("------------ Departments ------------");
+                            console.table(res);
+                        }
+                    );
+                    callback();
+                }
+                readDepts(function(){
+                    startApp();
+                });
                 break;
             case "View All Roles":
                 console.log(`Select Action: ${answers.mainAction}`);
-                connection.query(
-                    'SELECT r.title, r.salary, d.deptName FROM roles r LEFT JOIN departments d ON d.id = r.department_id', 
-                    function(err, res) {
-                        if (err) throw err;
-                        console.log("------------ Roles ------------");
-                        console.table(res);
-                    }
-                );
+                function readRoles(callback){
+                    connection.query(
+                        'SELECT r.title, r.salary, d.deptName FROM roles r LEFT JOIN departments d ON d.id = r.department_id', 
+                        function(err, res) {
+                            if (err) throw err;
+                            console.log("------------ Roles ------------");
+                            console.table(res);
+                        }
+                    );
+                    callback();
+                }
+                readRoles(function(){
+                    startApp();
+                });
                 break;
         }
     });
