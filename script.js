@@ -33,7 +33,7 @@ const menuPrompt = [{
 }];
 
 //Inquirer prompt for adding employee
-const addEmployee = [
+const addEmployeePrompt = [
     {
         type: "input",
         message: "Employee Name?",
@@ -57,29 +57,6 @@ const updateEmployeePrompt = [
         name: "updateEmployeeRoleID"
     },
 ];
-
-function updateEmployee(role, id, callback) {
-    console.log(`Role: ${role}`);
-    console.log(`ID: ${id}`);
-    connection.query(
-        "UPDATE employees SET ? WHERE ?", 
-        [
-            {
-              role_id: parseInt(role)
-            },
-            {
-              id: parseInt(id)
-            }
-          ],
-        function(err, res) {
-            if (err) throw err;
-            console.log(res);
-            callback();
-        }
-    );
-}
-
-
 
 function readEmployees(callback) {
     connection.query(
@@ -117,7 +94,40 @@ function readRoles(callback){
     );
 }
 
-let employeeNames = [];
+function addEmployee(role, name, callback){
+    connection.query(
+        "INSERT INTO employees SET ?",
+            {
+                employee_name: name,
+                role_id: role,
+            },
+            function(err) {
+                if (err) throw err;
+                callback();
+            }
+    );
+}
+
+function updateEmployee(role, id, callback) {
+    console.log(`Role: ${role}`);
+    console.log(`ID: ${id}`);
+    connection.query(
+        "UPDATE employees SET ? WHERE ?", 
+        [
+            {
+              role_id: parseInt(role)
+            },
+            {
+              id: parseInt(id)
+            }
+          ],
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            callback();
+        }
+    );
+}
 
 /*const removeEmployee = [{
     type: "list",
@@ -147,21 +157,14 @@ function startApp() {
             case "Add Employee":
                 console.log("------------ Add Employee ------------");
                 readRoles(function(){
-                    inquirer.prompt(addEmployee).then(answers => {
-                        connection.query(
-                            "INSERT INTO employees SET ?",
-                                {
-                                    employee_name: answers.employeeName,
-                                    role_id: answers.employeeRole
-                                },
-                                function(err) {
-                                    if (err) throw err;
-                                    console.log("Employee successfully added!");
-                                    startApp();
-                                }
-                        );
+                    inquirer.prompt(addEmployeePrompt).then(answers => {
+                        addEmployee(answers.employeeRole, answers.employeeName, function(){
+                            console.log("Employee successfully added!");
+                            startApp();
+                        });
                     });
                 });
+                break;
             case "Update Employee":
                 console.log("------------ Update Employee ------------");
                 readEmployees(function(){});
