@@ -15,6 +15,7 @@ connection.connect(function(err) {
     startApp();
 });
 
+//Inquirer prompt for start menu
 const menuPrompt = [{
     type: 'list',
     message: "What do you want to do?",
@@ -22,24 +23,25 @@ const menuPrompt = [{
         "View All Employees", 
         "View All Departments",
         "View All Roles", 
-        "View Employees by Department",
+        //"View Employees by Department",
         "Add Employee",
-        "Remove Employee",
+        //"Remove Employee",
         "Update Employee", 
         "Update Role"               
     ],
     name: "mainAction"
 }];
 
+//Inquirer prompt for adding employee
 const addEmployee = [
     {
         type: "input",
         message: "Employee Name?",
         name: "employeeName"
     },{
-        type: "list",
-        message: "Employee Role?",
-        choices: [
+        type: "input",
+        message: "Enter Role ID",
+        /*choices: [
             "Business Analyst",
             "Data Analyst",
             "Documentation Specialist",
@@ -52,151 +54,142 @@ const addEmployee = [
             "Compliance Specialist", 
             "Office Manager", 
             "Executive Assistant" 
-        ],
+        ],*/
         name: "employeeRole"
     }
 ];
 
+const updateEmployeePrompt = [
+    {
+        type: "input",
+        message: "Enter the ID of the employee you want to update",
+        name: "updateEmployeeID"
+    },
+    {
+        type: "input",
+        message: "Enter the ID of the role you want the employee to have",
+        name: "updateEmployeeRoleID"
+    },
+];
+
+function updateEmployee(role, id, callback) {
+    console.log(`Role: ${role}`);
+    console.log(`ID: ${id}`);
+    connection.query(
+        "UPDATE employees SET ? WHERE ?", 
+        [
+            {
+              role_id: parseInt(role)
+            },
+            {
+              id: parseInt(id)
+            }
+          ],
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            callback();
+        }
+    );
+}
+
+
+
+function readEmployees(callback) {
+    connection.query(
+        'SELECT e.id, e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
+        function(err, res) { 
+            if (err) throw err;
+            console.log("------------ EMPLOYEES ------------");
+            console.table(res);
+            callback();
+        }
+    );
+}
+
+function readDepts(callback) {
+    connection.query(
+        'SELECT d.deptName FROM departments d', 
+        function(err, res) {
+            if (err) throw err;
+            console.log("------------ Departments ------------");
+            console.table(res);
+            callback();
+        }
+    );
+}
+
+function readRoles(callback){
+    connection.query(
+        'SELECT r.id, r.title, r.salary, d.deptName FROM roles r LEFT JOIN departments d ON d.id = r.department_id', 
+        function(err, res) {
+            if (err) throw err;
+            console.log("------------ Roles ------------");
+            console.table(res);
+            callback();
+        }
+    );
+}
+
 let employeeNames = [];
 
-const removeEmployee = [{
+/*const removeEmployee = [{
     type: "list",
-    message: "Employee Role?",
+    message: "Which employee would you like to remove?",
     choices: employeeNames,
     name: "deleteEmployee"
-}];
+}];*/
 
 function startApp() {
     inquirer.prompt(menuPrompt).then(answers => {
         switch (answers.mainAction){
             case "View All Employees":
-                function readEmployees(callback) {
-                    connection.query(
-                        'SELECT e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
-                        function(err, res) { 
-                            if (err) throw err;
-                            console.log("------------ EMPLOYEES ------------");
-                            console.table(res);
-                        }
-                    );
-                    callback();
-                }
                 readEmployees(function(){
                     startApp();
                 });
                 break;
             case "View All Departments":
-                function readDepts(callback) {
-                    connection.query(
-                        'SELECT d.deptName FROM departments d', 
-                        function(err, res) {
-                            if (err) throw err;
-                            console.log("------------ Departments ------------");
-                            console.table(res);
-                        }
-                    );
-                    callback();
-                }
                 readDepts(function(){
                     startApp();
                 });
                 break;
             case "View All Roles":
-                function readRoles(callback){
-                    connection.query(
-                        'SELECT r.title, r.salary, d.deptName FROM roles r LEFT JOIN departments d ON d.id = r.department_id', 
-                        function(err, res) {
-                            if (err) throw err;
-                            console.log("------------ Roles ------------");
-                            console.table(res);
-                        }
-                    );
-                    callback();
-                }
                 readRoles(function(){
                     startApp();
                 });
                 break;
             case "Add Employee":
                 console.log("------------ Add Employee ------------");
-                inquirer.prompt(addEmployee).then(answers => {
-                    let roleID = 0;
-                    switch (answers.employeeRole){
-                        case "Business Analyst":
-                            roleId = 1;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;
-                        case "Data Analyst":
-                            roleId = 2;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;
-                        case "Documentation Specialist":
-                            roleId = 3;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;   
-                        case "Performance Analyst":
-                            roleId = 4;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;  
-                        case "Investment Analyst":
-                            roleId = 5;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;
-                        case "Client Service Coordinator":
-                            roleId = 6;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;
-                        case "Research Analyst":
-                            roleId = 7;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;   
-                        case "Research Associate":
-                            roleId = 8;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;   
-                        case "Compliance Manager":
-                            roleId = 9;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;   
-                        case "Compliance Specialist":
-                            roleId = 10;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;   
-                        case "Office Manager":
-                            roleId = 11;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;   
-                        case "Executive Assistant":
-                            roleId = 12;
-                            console.log(`Selected Role: ${answers.employeeRole}`);
-                            console.log(`Role ID: ${roleID}`);
-                            break;                              
-                    }
-                    connection.query(
-                        "INSERT INTO employees SET ?",
-                            {
-                                employee_name: answers.employeeName,
-                                role_id: roleID
-                            },
-                            function(err) {
-                                if (err) throw err;
-                                console.log("Employee successfully added!");
-                                startApp();
-                            }
-                    );
+                readRoles(function(){
+                    inquirer.prompt(addEmployee).then(answers => {
+                        connection.query(
+                            "INSERT INTO employees SET ?",
+                                {
+                                    employee_name: answers.employeeName,
+                                    role_id: answers.employeeRole
+                                },
+                                function(err) {
+                                    if (err) throw err;
+                                    console.log("Employee successfully added!");
+                                    startApp();
+                                }
+                        );
+                    });
                 });
-            case "Remove Employee": 
+            case "Update Employee":
+                console.log("------------ Update Employee ------------");
+                readEmployees(function(){});
+                readRoles(function(){
+                    inquirer.prompt(updateEmployeePrompt).then(answers => {
+                        updateEmployee(answers.updateEmployeeRoleID, answers.updateEmployeeID, function(){
+                            console.log(`Employee Successfully Updated`);
+                            startApp();
+                        });
+                    })
+                })
+            break;
+
+            /*case "Remove Employee": 
                 console.log(`Remove Employee`);
                 connection.query(
                     'SELECT e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
@@ -206,11 +199,12 @@ function startApp() {
                         for (let i=0; i<res.length; i++){
                             employeeNames.push(res[i].employee_name);
                         }
-                        console.log(employeeNames);
-                        
+                        inquirer.prompt(removeEmployee).then(answers => {
+                            console.log(`Deleted Employee: ${answers.deleteEmployee}`);
+                        });                        
                     }
                 ); 
-                break;
+                break;*/
             break;
         }
     });
