@@ -27,7 +27,7 @@ const menuPrompt = [{
         "Add Employee",
         //"Remove Employee",
         "Update Employee", 
-        "Update Role"               
+        //"Update Role"               
     ],
     name: "mainAction"
 }];
@@ -40,21 +40,7 @@ const addEmployee = [
         name: "employeeName"
     },{
         type: "input",
-        message: "Enter Role ID",
-        /*choices: [
-            "Business Analyst",
-            "Data Analyst",
-            "Documentation Specialist",
-            "Performance Analyst", 
-            "Investment Analyst", 
-            "Client Service Coordinator", 
-            "Research Analyst", 
-            "Research Associate", 
-            "Compliance Manager", 
-            "Compliance Specialist", 
-            "Office Manager", 
-            "Executive Assistant" 
-        ],*/
+        message: "Enter the Role ID for the Employee",
         name: "employeeRole"
     }
 ];
@@ -62,12 +48,12 @@ const addEmployee = [
 const updateEmployeePrompt = [
     {
         type: "input",
-        message: "Enter the ID of the employee you want to update",
+        message: "Enter the ID of the Employee you want to Update",
         name: "updateEmployeeID"
     },
     {
         type: "input",
-        message: "Enter the ID of the role you want the employee to have",
+        message: "Enter the ID of the Role you want the Employee to have",
         name: "updateEmployeeRoleID"
     },
 ];
