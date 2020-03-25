@@ -272,7 +272,7 @@ function startApp() {
                 readEmployees(function(){});
                 readRoles(function(){
                     inquirer.prompt(updateEmployeePrompt).then(answers => {
-                        updatEmployee(answers.updateEmployeeRoleID, answers.updateEmployeeID, function(){
+                        updateEmployee(answers.updateEmployeeRoleID, answers.updateEmployeeID, function(){
                             console.log(`Employee Successfully Updated`);
                             startApp();
                         });
