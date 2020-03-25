@@ -20,7 +20,7 @@ MySQL is the database management system that houses the employee data.
 
 See below for a preview of what the application looks like:
 
-
+![Demo](./assets/demo.gif)
 
 ## License
 
