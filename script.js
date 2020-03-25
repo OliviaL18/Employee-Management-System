@@ -15,7 +15,7 @@ connection.connect(function(err) {
     startApp();
 });
 
-//Inquirer prompt for start menu
+//Inquirer prompts
 const menuPrompt = [{
     type: 'list',
     message: "What do you want to do?",
@@ -23,16 +23,13 @@ const menuPrompt = [{
         "View All Employees", 
         "View All Departments",
         "View All Roles", 
-        //"View Employees by Department",
         "Add Employee",
-        //"Remove Employee",
+        "Add Department",
+        "Add Role",
         "Update Employee", 
-        //"Update Role"               
     ],
     name: "mainAction"
 }];
-
-//Inquirer prompt for adding employee
 const addEmployeePrompt = [
     {
         type: "input",
@@ -44,7 +41,26 @@ const addEmployeePrompt = [
         name: "employeeRole"
     }
 ];
-
+const addDeptPrompt = [{
+        type: "input",
+        message: "New Department Name?",
+        name: "deptName"
+}];
+const addRolePrompt = [
+    {
+        type: "input",
+        message: "New Role Title?",
+        name: "roleTitle"
+    },{
+        type: "input",
+        message: "Enter the Salary for the New Role",
+        name: "roleSalary"
+    },{
+        type: "input",
+        message: "Enter Department ID for the New Role",
+        name: "roleDept"
+    }
+];
 const updateEmployeePrompt = [
     {
         type: "input",
@@ -58,6 +74,7 @@ const updateEmployeePrompt = [
     },
 ];
 
+//Read Functions
 function readEmployees(callback) {
     connection.query(
         'SELECT e.id, e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
@@ -69,10 +86,9 @@ function readEmployees(callback) {
         }
     );
 }
-
 function readDepts(callback) {
     connection.query(
-        'SELECT d.deptName FROM departments d', 
+        'SELECT * FROM departments', 
         function(err, res) {
             if (err) throw err;
             console.log("------------ Departments ------------");
@@ -81,7 +97,6 @@ function readDepts(callback) {
         }
     );
 }
-
 function readRoles(callback){
     connection.query(
         'SELECT r.id, r.title, r.salary, d.deptName FROM roles r LEFT JOIN departments d ON d.id = r.department_id', 
@@ -94,6 +109,7 @@ function readRoles(callback){
     );
 }
 
+//Add functions
 function addEmployee(role, name, callback){
     connection.query(
         "INSERT INTO employees SET ?",
@@ -107,7 +123,37 @@ function addEmployee(role, name, callback){
             }
     );
 }
+function addDept(name, callback){
+    connection.query(
+        "INSERT INTO departments SET ?",
+            {
+                deptName: name,
+            },
+            function(err) {
+                if (err) throw err;
+                callback();
+            }
+    );
+}
+function addRole(title, salary, dept, callback){
+    connection.query(
+        "INSERT INTO roles SET ?",
+            {
+                title: title,
+                salary: parseInt(salary),
+                department_id: parseInt(dept)
 
+            },
+            function(err) {
+                if (err) throw err;
+                callback();
+            }
+    );
+}
+
+
+
+//Update functions
 function updateEmployee(role, id, callback) {
     console.log(`Role: ${role}`);
     console.log(`ID: ${id}`);
@@ -123,18 +169,10 @@ function updateEmployee(role, id, callback) {
           ],
         function(err, res) {
             if (err) throw err;
-            console.log(res);
             callback();
         }
     );
 }
-
-/*const removeEmployee = [{
-    type: "list",
-    message: "Which employee would you like to remove?",
-    choices: employeeNames,
-    name: "deleteEmployee"
-}];*/
 
 function startApp() {
     inquirer.prompt(menuPrompt).then(answers => {
@@ -160,6 +198,26 @@ function startApp() {
                     inquirer.prompt(addEmployeePrompt).then(answers => {
                         addEmployee(answers.employeeRole, answers.employeeName, function(){
                             console.log("Employee successfully added!");
+                            startApp();
+                        });
+                    });
+                });
+                break;
+            case "Add Department":
+                console.log("------------ Add Department ------------");
+                inquirer.prompt(addDeptPrompt).then(answers => {
+                    addDept(answers.deptName, function(){
+                        console.log("Department successfully added!");
+                        startApp();
+                    });
+                });
+                break;
+            case "Add Role":
+                console.log("------------ Add Role ------------");
+                readDepts(function(){
+                    inquirer.prompt(addRolePrompt).then(answers => {
+                        addRole(answers.roleTitle, answers.roleSalary, answers.roleDept, function(){
+                            console.log("Role successfully added!");
                             startApp();
                         });
                     });
