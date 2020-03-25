@@ -27,9 +27,11 @@ const menuPrompt = [{
         "Add Department",
         "Add Role",
         "Update Employee", 
+        "Update Role"
     ],
     name: "mainAction"
 }];
+
 const addEmployeePrompt = [
     {
         type: "input",
@@ -41,11 +43,13 @@ const addEmployeePrompt = [
         name: "employeeRole"
     }
 ];
+
 const addDeptPrompt = [{
         type: "input",
         message: "New Department Name?",
         name: "deptName"
 }];
+
 const addRolePrompt = [
     {
         type: "input",
@@ -61,6 +65,7 @@ const addRolePrompt = [
         name: "roleDept"
     }
 ];
+
 const updateEmployeePrompt = [
     {
         type: "input",
@@ -74,6 +79,24 @@ const updateEmployeePrompt = [
     },
 ];
 
+const updateRolePrompt = [
+    {
+        type: "input",
+        message: "Enter the ID of the Role you want to Update",
+        name: "updateRole"
+    },
+    {
+        type: "input",
+        message: "Enter the new Title for the Role",
+        name: "updateRoleTitle"
+    },
+    {
+        type: "input",
+        message: "Enter the new Salary for the Role",
+        name: "updateRoleSalary"
+    },
+]
+
 //Read Functions
 function readEmployees(callback) {
     connection.query(
@@ -86,6 +109,7 @@ function readEmployees(callback) {
         }
     );
 }
+
 function readDepts(callback) {
     connection.query(
         'SELECT * FROM departments', 
@@ -97,6 +121,7 @@ function readDepts(callback) {
         }
     );
 }
+
 function readRoles(callback){
     connection.query(
         'SELECT r.id, r.title, r.salary, d.deptName FROM roles r LEFT JOIN departments d ON d.id = r.department_id', 
@@ -123,6 +148,7 @@ function addEmployee(role, name, callback){
             }
     );
 }
+
 function addDept(name, callback){
     connection.query(
         "INSERT INTO departments SET ?",
@@ -135,6 +161,7 @@ function addDept(name, callback){
             }
     );
 }
+
 function addRole(title, salary, dept, callback){
     connection.query(
         "INSERT INTO roles SET ?",
@@ -151,12 +178,8 @@ function addRole(title, salary, dept, callback){
     );
 }
 
-
-
 //Update functions
 function updateEmployee(role, id, callback) {
-    console.log(`Role: ${role}`);
-    console.log(`ID: ${id}`);
     connection.query(
         "UPDATE employees SET ? WHERE ?", 
         [
@@ -173,6 +196,27 @@ function updateEmployee(role, id, callback) {
         }
     );
 }
+
+function updateRole(title, salary, id, callback) {
+    connection.query(
+        "UPDATE roles SET ? WHERE ?", 
+        [
+            {
+              title: title,
+              salary: parseInt(salary)
+
+            },
+            {
+              id: parseInt(id)
+            }
+          ],
+        function(err, res) {
+            if (err) throw err;
+            callback();
+        }
+    );
+}
+
 
 function startApp() {
     inquirer.prompt(menuPrompt).then(answers => {
@@ -228,31 +272,23 @@ function startApp() {
                 readEmployees(function(){});
                 readRoles(function(){
                     inquirer.prompt(updateEmployeePrompt).then(answers => {
-                        updateEmployee(answers.updateEmployeeRoleID, answers.updateEmployeeID, function(){
+                        updatEmployee(answers.updateEmployeeRoleID, answers.updateEmployeeID, function(){
                             console.log(`Employee Successfully Updated`);
                             startApp();
                         });
                     })
                 })
-            break;
-
-            /*case "Remove Employee": 
-                console.log(`Remove Employee`);
-                connection.query(
-                    'SELECT e.employee_name, d.deptName, r.title, r.salary FROM employees e LEFT JOIN roles r ON r.id = e.role_id LEFT JOIN departments d ON d.id = r.department_id', 
-                    function(err, res) { 
-                        if (err) throw err;
-
-                        for (let i=0; i<res.length; i++){
-                            employeeNames.push(res[i].employee_name);
-                        }
-                        inquirer.prompt(removeEmployee).then(answers => {
-                            console.log(`Deleted Employee: ${answers.deleteEmployee}`);
-                        });                        
-                    }
-                ); 
-                break;*/
-            break;
+                break;
+            case "Update Role":
+                readRoles(function(){
+                    inquirer.prompt(updateRolePrompt).then(answers => {
+                        updateRole(answers.updateRoleTitle, answers.updateRoleSalary, answers.updateRole, function(){
+                            console.log(`Role Successfully Updated`);
+                            startApp();
+                        });
+                    })
+                });
+                break;
         }
     });
 }
